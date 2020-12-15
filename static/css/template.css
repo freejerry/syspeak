@@ -1,0 +1,70 @@
+/* template */
+body,html {
+  scroll-behavior: smooth;
+}
+html {
+  min-height: 100%;
+  position: relative;
+}
+body {
+  padding-bottom: 100px;
+}
+
+td {
+  vertical-align: middle !important;
+}
+
+/* hidden spacer before sections for proper offset */
+section:before {
+    height: 56px;
+    content: "";
+    display:block;
+}
+
+header {
+    height: 88vh;
+}
+
+/* login */
+.mr-center {
+    margin: 0 auto;
+}
+
+/* nav bar */
+.actives {
+    color: #FFF !important;
+}
+
+/* helpers */
+.vh-50 {
+    min-height: 50vh;
+}
+.vh-75 {
+    min-height: 75vh;
+}
+.vh-100 {
+    min-height: 100vh;
+}
+
+/* footer */
+footer {
+    position: absolute;
+    right: 0;
+    /*top: 100%;*/
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  h1, h2 {
+    font-size: 1.5rem;
+  }
+  footer h6 {
+    font-size: 0.7rem;
+  }
+}
