@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+
+{% block title %}User panel - {{project.project_name}}{% endblock %}
+{% block up %} actives{% endblock %}
+
+{% block content %}
+<section class="container pb-5">
+    <div class="row">
+        <div class="col-md-12 py-3">
+            <div class="row clearfix">
+                <div class="col-sm-12 col-md-3 col-lg-2">
+                    <div class="pb-3">
+                        <a href=".." class="btn btn-primary align-bottom mr-1 col-sm-12">Back to list</a>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <h1>Project infomation</h1>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-md-12 col-lg-12 mb-4">
+            <div class="card h-100 py-3 px-3" style="overflow: hidden;">
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 col-lg-2">
+                        <h5>Project name: </h5>
+                    </div>
+                    <div class="col-sm-12 col-md-9">
+                        <p>{{project.name}} - <a href="/dataviewer/view/{{project.id}}" target="_blank">View</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 col-lg-2">
+                        <h5>Discription: </h5>
+                    </div>
+                    <div class="col-sm-12 col-md-9">
+                        <p>{{project.description}}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 col-lg-2">
+                        <h5>API KEY: </h5>
+                    </div>
+                    <div class="col-sm-12 col-md-9">
+                        <p>{{project.api_key}}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 col-lg-2">
+                        <h5>Data interface: </h5>
+                    </div>
+                    <div class="col-sm-12 col-md-9 col-lg-10">
+                        <p>https://phyiotlab.ndhu.edu.tw/speakapi/insertdata/{{project.prj_id}}/?api_key={{project.api_key}}&[Data
+                            Series]</p>
+                    </div>
+                </div>
+                <div class="row justify-content-end">
+                    <div class="col-sm-12 col-md-6 col-lg-5 text-right">
+                        <button class="btn btn-primary align-bottom mr-1 col-sm-12 col-md-6 col-lg-5 my-1"
+                            data-toggle="modal" data-target="#editPrjModal">
+                            Edit information
+                        </button>
+                        <button class="btn btn-danger align-bottom mr-1 col-sm-12 col-md-5 col-lg-5 my-1"
+                            data-toggle="modal" data-target="#delPrjModal">
+                            Delete project
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-lg-8 my-1">
+            <h2>Charts:</h2>
+            <div class="table-responsive card py-3 px-3">
+                <button class="btn btn-primary col-md-3 col-lg-2 my-1 btn-sm" id="new_chart">New</button>
+                <div class="my-1" style="display: none;" id="form_chart">
+                    <form action="new_chart/" method="POST">
+                        <div class="form-group row">
+                            <label class="col-md-12 col-lg-3 col-form-label form-control-label text-muted">Title</label>
+                            <div class="col-md-12 col-lg-3">
+                                
+                            </div>
+                            <label class="col-md-12 col-lg-2 col-form-label form-control-label text-muted">Type</label>
+                            <div class="col-md-12 col-lg-4">
+                                
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label
+                                class="col-md-12 col-lg-3 col-form-label form-control-label text-muted">Discription</label>
+                            <div class="col-md-12 col-lg-9">
+                                
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label id="x" class="col-md-12 col-lg-3 col-form-label form-control-label text-muted">X-axis
+                                Label</label>
+                            <div class="col-md-12 col-lg-3">
+                                
+                            </div>
+                            <label class="col-md-12 col-lg-3 col-form-label form-control-label text-muted yaxis">Y-axis
+                                Label</label>
+                            <div class="col-md-12 col-lg-3 yaxis">
+                                
+                            </div>
+                        </div>
+                        <div class="form-group row justify-content-end">
+                            <div class="col-md-12 col-lg-3">
+                                <input type="submit" class="col-12 btn btn-primary mr-2" value="Create">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <table class="table table-hover table-sm">
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Discription</th>
+                    </tr>
+                    {% if charts %}
+                    {% for chart in charts %}
+                    <tr>
+                        <td><a href="#" class="viewChart" data-id={{chart.id}}>{{chart.chartTitle}}</a></td>
+                        <td>{{chart.get_chartType_display}}</td>
+                        <td>{{chart.chartDisc}}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td class="text-center" colspan="3">No chart available, create the new one first.</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        <div class="col-md-12 col-lg-4 my-1">
+            <h2>Data series:</h2>
+            <div class="table-responsive card py-3 px-3">
+                <button class="btn btn-primary col-md-6 col-lg-4 my-1 btn-sm" id="new_series">New</button>
+                <div class="row my-1" style="display: none;" id="form_series">
+                    <div class="col-lg-12 col-sm-12">
+                        <form action="new_series/" method="POST">
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" name="label" id="id_label" required=""
+                                    placeholder="New series">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary rounded-right" type="submit">Create</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <table class="table table-hover table-sm">
+                    <tr>
+                        <th class="w-25">ID</th>
+                        <th class="w-50">Name</th>
+                        <th></th>
+                    </tr>
+                    {% if series %}
+                    {% for ser in series %}
+                    <tr>
+                        <td>
+                            <!--<a href="series/{{ ser.id }}/">-->{{ser.id}}
+                            <!--</a>-->
+                        </td>
+                        <td>{{ser.label}}</td>
+                        <td><button class="empty_series btn btn-sm btn-danger" data-id="{{ser.id}}"
+                                data-name="{{ser.label}}">Empty</button></td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td class="text-center" colspan="3">No data series available, create the new one first.</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block modal %}
+<div class="modal fade" id="editPrjModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit project</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="./{{ project.prj_id }}" method="POST">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label form-control-label text-muted">Project name</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" placeholder="建三小" name="prj_name" aria-label="prj_name" value="{{project.name}}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label form-control-label text-muted">Discription</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" placeholder="叫三小" name="prj_desc" aria-label="prj_desc" value="{{project.description}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="delPrjModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete project</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="." method="POST">
+                <div class="modal-body text-center">
+                    <p>Are you sure to delete this project?<br />All data in this project will be delete.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-danger" href="./{{ project.prj_id }}/delete" >Delete</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="emptySerModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Empty series</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="." method="POST">
+                <div class="modal-body text-center">
+                    <p id="emptyMsg">Are you sure to empty this series: "<b id="emptySerModalName"></b>"?<br />
+                        All data in this series will be delete.</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="emptySeriesID">
+                    <button id="emptySeriesCancel" type="button" class="btn btn-secondary"
+                        data-dismiss="modal">Cancel</button>
+                    <button id="emptySeriesBtn" type="button" class="btn btn-danger">Empty</button>
+                    <button id="emptySeriesOK" type="button" class="btn btn-primary"" style=" display: none;"
+                        data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="chartModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chart Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="chartInfo">Loading...</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bodyjs %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"
+    integrity="sha256-1A78rJEdiWTzco6qdn3igTBv9VupN3Q1ozZNTR4WE/Y=" crossorigin="anonymous"></script>
+<script>
+    $('#new_series').on('click', function () {
+        $('#form_series').slideToggle(500, 'swing');
+    });
+    $('#new_chart').on('click', function () {
+        $('#form_chart').slideToggle(500, 'swing');
+    });
+    $('.empty_series').on('click', function () {
+        $('#emptySeriesBtn').removeAttr('disabled');
+        $('#emptySeriesCancel').show();
+        $('#emptySeriesBtn').show();
+        $('#emptySeriesOK').hide();
+        $('#emptyMsg').html('Are you sure to empty this series: "<b id="emptySerModalName"></b>"?<br />All data in this series will be deleted.');
+        var series_id = $(this).data('id');
+        var series_name = $(this).data('name');
+        $('#emptySeriesID').val(series_id);
+        $('#emptySeriesBtn').attr('data-id', series_id);
+        $('#emptySerModalId').text(series_id);
+        $('#emptySerModalName').text(series_name);
+        $('#emptySerModal').modal('show');
+    });
+    $('#emptySeriesBtn').on('click', function () {
+        var series_id = $('#emptySeriesID').val();
+        $.ajax({
+            url: '/speakapi/delete_data/{{project.id}}/' + series_id + '/',
+            beforeSend: function () {
+                $('#emptySeriesCancel').hide();
+                $('#emptySeriesBtn').attr('disabled', '');
+                $('#emptyMsg').html('Processing...<br />Please don\'t close this dialog until it finish.');
+            },
+            success: function (result) {
+                if (result == '1') {
+                    $('#emptySeriesCancel').hide();
+                    $('#emptySeriesBtn').hide();
+                    $('#emptySeriesOK').show();
+                    $('#emptyMsg').html('Series has been emptied.');
+                } else {
+                    $('#emptySeriesBtn').removeAttr('disabled');
+                    $('#emptySeriesCancel').show();
+                    $('#emptyMsg').html('Something was wrong.');
+                }
+            }
+        });
+    });
+    $('.viewChart').on('click', function () {
+        event.preventDefault();
+        var chart_id = $(this).data('id');
+        $('#chartModal').modal('show');
+        loadChart(chart_id);
+    });
+    loadChart = function (chart_id) {
+        event.preventDefault();
+        $.ajax({
+            url: 'chart/' + chart_id + '/',
+            beforeSend: function () {
+                $('#chartInfo').text('Loading...');
+            },
+            success: function (result) {
+                $('#chartInfo').html(result);
+            }
+        });
+    };
+    $('#id_chartType').on('change', function () {
+        if (this.value == '0') {
+            $('#id_chartYaxis').val('');
+            $('#x').text('X-axis Label');
+            $('.yaxis').show();
+        } else if (this.value == '9') {
+            $('#id_chartYaxis').val('thermal');
+            $('#x').text('Data Name:');
+            $('.yaxis').hide();
+        }
+    });
+</script>
+{% endblock %}

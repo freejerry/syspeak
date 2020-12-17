@@ -22,6 +22,8 @@ def create_app():
     from . import userpanel
     app.register_blueprint(userpanel.bp, url_prefix='/userpanel')
 
+    from . import hello
+    app.register_blueprint(hello.bp, url_prefix='/hello')
     return app
 
 if __name__ == '__main__':
