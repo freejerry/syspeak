@@ -25,7 +25,7 @@
                             <th class="w-25">Created date</th>
                             <th>View</th>
                         </tr>
-                        {% if projects %}
+                        {% if projects.count() %}
                         {% for project in projects %}
                         <tr>
                             <td><a href="project/{{ project.prj_id }}">{{ project.name }}</a></td>

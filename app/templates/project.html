@@ -56,8 +56,10 @@
                 </div>
                 <div class="row justify-content-end">
                     <div class="col-sm-12 col-md-6 col-lg-5 text-right">
+                        <!-- toggle 等於觸發 , modal是bootstrap裡面的元素 modal表單,這裡的modal表單是editinformation的表單 -->
                         <button class="btn btn-primary align-bottom mr-1 col-sm-12 col-md-6 col-lg-5 my-1"
                             data-toggle="modal" data-target="#editPrjModal">
+                            <!-- 加＃代表找id的位置 -->
                             Edit information
                         </button>
                         <button class="btn btn-danger align-bottom mr-1 col-sm-12 col-md-5 col-lg-5 my-1"
@@ -75,36 +77,44 @@
             <div class="table-responsive card py-3 px-3">
                 <button class="btn btn-primary col-md-3 col-lg-2 my-1 btn-sm" id="new_chart">New</button>
                 <div class="my-1" style="display: none;" id="form_chart">
-                    <form action="new_chart/" method="POST">
+                    <form action="./{{ project.prj_id }}" method="POST">
                         <div class="form-group row">
                             <label class="col-md-12 col-lg-3 col-form-label form-control-label text-muted">Title</label>
                             <div class="col-md-12 col-lg-3">
-                                
+                                <input type="text" class="form-control" placeholder="要叫什麼呢" name="chart_title"
+                                    aria-label="chart_title">
                             </div>
                             <label class="col-md-12 col-lg-2 col-form-label form-control-label text-muted">Type</label>
                             <div class="col-md-12 col-lg-4">
-                                
+                                <select name="chart_type" class="form-control">
+                                    <option value="0" selected="">Line graph</option>
+                                    <option value="9">Heatmap</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label
-                                class="col-md-12 col-lg-3 col-form-label form-control-label text-muted">Discription</label>
+                                class="col-md-12 col-lg-3 col-form-label form-control-label text-muted">Description</label>
                             <div class="col-md-12 col-lg-9">
-                                
+                                <input type="text" class="form-control" placeholder="要叫什麼呢" name="chart_description"
+                                    aria-label="chart_description">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label id="x" class="col-md-12 col-lg-3 col-form-label form-control-label text-muted">X-axis
                                 Label</label>
                             <div class="col-md-12 col-lg-3">
-                                
+                                <input type="text" class="form-control" placeholder="要叫什麼呢" name="chart_x_label"
+                                    aria-label="chart_x_label">
                             </div>
                             <label class="col-md-12 col-lg-3 col-form-label form-control-label text-muted yaxis">Y-axis
                                 Label</label>
                             <div class="col-md-12 col-lg-3 yaxis">
-                                
+                                <input type="text" class="form-control" placeholder="要叫什麼呢" name="chart_y_label"
+                                    aria-label="chart_y_label">
                             </div>
                         </div>
+                        <input type="hidden" name="action" value="create_chart" />
                         <div class="form-group row justify-content-end">
                             <div class="col-md-12 col-lg-3">
                                 <input type="submit" class="col-12 btn btn-primary mr-2" value="Create">
@@ -118,12 +128,12 @@
                         <th>Type</th>
                         <th>Discription</th>
                     </tr>
-                    {% if charts %}
+                    {% if charts.count() %}
                     {% for chart in charts %}
                     <tr>
-                        <td><a href="#" class="viewChart" data-id={{chart.id}}>{{chart.chartTitle}}</a></td>
-                        <td>{{chart.get_chartType_display}}</td>
-                        <td>{{chart.chartDisc}}</td>
+                        <td><a href="#" class="viewChart" data-id="{{chart.chart_id}}">{{chart.title}}</a></td>
+                        <td>{{chart.type_text()}}</td>
+                        <td>{{chart.description}}</td>
                     </tr>
                     {% endfor %}
                     {% else %}
@@ -140,7 +150,8 @@
                 <button class="btn btn-primary col-md-6 col-lg-4 my-1 btn-sm" id="new_series">New</button>
                 <div class="row my-1" style="display: none;" id="form_series">
                     <div class="col-lg-12 col-sm-12">
-                        <form action="new_series/" method="POST">
+                        <form action="./{{ project.prj_id }}" method="POST">
+                            <input type="hidden" name="action" value="create_series" />
                             <div class="input-group mb-1">
                                 <input type="text" class="form-control" name="label" id="id_label" required=""
                                     placeholder="New series">
@@ -157,15 +168,15 @@
                         <th class="w-50">Name</th>
                         <th></th>
                     </tr>
-                    {% if series %}
+                    {% if series.count() %}
                     {% for ser in series %}
                     <tr>
                         <td>
-                            <!--<a href="series/{{ ser.id }}/">-->{{ser.id}}
+                            <!--<a href="series/{{ ser.id }}/">-->{{ser.series_id}}
                             <!--</a>-->
                         </td>
                         <td>{{ser.label}}</td>
-                        <td><button class="empty_series btn btn-sm btn-danger" data-id="{{ser.id}}"
+                        <td><button class="empty_series btn btn-sm btn-danger" data-id="{{ser.series_id}}"
                                 data-name="{{ser.label}}">Empty</button></td>
                     </tr>
                     {% endfor %}
@@ -196,16 +207,19 @@
                     <div class="form-group row">
                         <label class="col-lg-3 col-form-label form-control-label text-muted">Project name</label>
                         <div class="col-lg-9">
-                            <input type="text" class="form-control" placeholder="建三小" name="prj_name" aria-label="prj_name" value="{{project.name}}">
+                            <input type="text" class="form-control" placeholder="建三小" name="prj_name"
+                                aria-label="prj_name" value="{{project.name}}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-lg-3 col-form-label form-control-label text-muted">Discription</label>
                         <div class="col-lg-9">
-                            <input type="text" class="form-control" placeholder="叫三小" name="prj_desc" aria-label="prj_desc" value="{{project.description}}">
+                            <input type="text" class="form-control" placeholder="叫三小" name="prj_desc"
+                                aria-label="prj_desc" value="{{project.description}}">
                         </div>
                     </div>
                 </div>
+                <input type="hidden" name="action" value="update" />
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Update</button>
@@ -229,7 +243,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-danger" href="./{{ project.prj_id }}/delete" >Delete</a>
+                    <a class="btn btn-danger" href="./{{ project.prj_id }}/delete">Delete</a>
                 </div>
             </form>
         </div>
@@ -272,6 +286,153 @@
             </div>
             <div class="modal-body">
                 <div id="chartInfo">Loading...</div>
+                <div id="chartContent">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            <h5>Title: </h5>
+                        </div>
+                        <div class="col-sm-12 col-md-9">
+                            <p id="chart_title"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            <h5>Description: </h5>
+                        </div>
+                        <div class="col-sm-12 col-md-9">
+                            <p id="chart_desc"></p>
+                        </div>
+                    </div>
+                    <div id="chart_type_0">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-3 col-lg-3">
+                                <h5>X-axis label: </h5>
+                            </div>
+                            <div class="col-sm-12 col-md-9">
+                                <p id="chart_x"></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-3 col-lg-3">
+                                <h5>Y-axis label: </h5>
+                            </div>
+                            <div class="col-sm-12 col-md-9">
+                                <p id="chart_y"></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-lg-3">
+                                <button id="newTraceBtn" class="col-12 btn btn-primary mr-2">New Trace</button>
+                            </div>
+                        </div>
+                        <div id="newTraceForm" style="display: none;" class="row">
+                            <div class="col-md-12">
+                                <form id="traceForm" action="chart/9/new_trace/">
+                                    <p>
+                                        <label for="id_traceName">TraceName:</label>
+                                        <input type="text" name="traceName" class="form-control" maxlength="200"
+                                            required="" id="id_traceName">
+                                    </p>
+                                    <p>
+                                        <label for="id_xAxis">XAxis:</label>
+                                        <select name="xAxis" class="form-control" required="" id="id_xAxis">
+                                            <option value="" selected="">---------</option>
+                                        </select>
+                                    </p>
+                                    <p>
+                                        <label for="id_yAxis">YAxis:</label>
+                                        <select name="yAxis" class="form-control" required="" id="id_yAxis">
+                                            <option value="" selected="">---------</option>
+                                        </select>
+                                    </p>
+                                    <button type="submit" id="submitTraceForm"
+                                        class="col-12 btn btn-primary mr-2">Create</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5>Traces:</h5>
+                            </div>
+                        </div>
+                        <div class="table-responsive card py-3 px-3">
+                            <table class="table table-hover table-sm">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>X axis</th>
+                                    <th>Y axis</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td> ()</td>
+                                    <td> ()</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="3">No any trace in this chart.</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="chart_type_9">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-3 col-lg-3">
+                                <h5>Data series: </h5>
+                            </div>
+                            <div class="col-sm-12 col-md-9">
+                                <p></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-lg-3">
+                                <button id="newTraceBtn" class="col-12 btn btn-primary mr-2">Mapping Data</button>
+                            </div>
+                        </div>
+                        <div id="newTraceForm" style="display: none;" class="row">
+                            <div class="col-md-12">
+                                <form id="traceForm" action="chart//new_trace/">
+                                    <p><label for="id_traceName">Name</label></p>
+                                    <p><label for="id_xAxis">Data series</label></p>
+                                    <input type="hidden" class="yAxis" id="id_yAxis" name="yAxis" value="" />
+                                    <button type="submit" id="submitTraceForm"
+                                        class="col-12 btn btn-primary mr-2">Create</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5>Data:</h5>
+                            </div>
+                        </div>
+                        <div class="table-responsive card py-3 px-3">
+                            <table class="table table-hover table-sm">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Data series</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center" colspan="2">Mapping data series first.</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5>Data:</h5>
+                            </div>
+                        </div>
+                        <div class="table-responsive card py-3 px-3">
+                            <table class="table table-hover table-sm">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Data series</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td> ()</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -328,24 +489,39 @@
             }
         });
     });
-    $('.viewChart').on('click', function () {
-        event.preventDefault();
-        var chart_id = $(this).data('id');
-        $('#chartModal').modal('show');
-        loadChart(chart_id);
+
+    $('.viewChart').on('click', function () { //”.“是class,當class=viewchart的東西被按到就觸發
+        event.preventDefault(); //避免html預設值跳出的功能
+        var chart_id = $(this).data('id'); //去撈點下去的這個資料的id
+        $('#chartModal').modal('show'); //show出id=chartmodal的modal
+        loadChart(chart_id); //讀取撈到的資料的id內容
     });
+
     loadChart = function (chart_id) {
-        event.preventDefault();
         $.ajax({
-            url: 'chart/' + chart_id + '/',
-            beforeSend: function () {
-                $('#chartInfo').text('Loading...');
+            url: '../chart/' + chart_id,
+            beforeSend: function () {//要資料前做的事
+                $('#chart_type_0').hide();
+                $('#chart_type_9').hide();
+                $('#chartContent').hide();
+                $('#chartInfo').show();
             },
-            success: function (result) {
-                $('#chartInfo').html(result);
+            success: function (result) {//成功要到資料後要做的事情
+                $('#chartInfo').hide();
+                $('#chartContent').show();
+                $('#chart_title').text(result.title);
+                $('#chart_desc').text(result.description);
+                $('#chart_x').text(result.x_label);
+                $('#chart_y').text(result.y_label);
+                if(result.chart_type == 0){
+                    $('#chart_type_0').show();
+                }else{
+                    $('#chart_type_9').show();
+                }
             }
         });
     };
+
     $('#id_chartType').on('change', function () {
         if (this.value == '0') {
             $('#id_chartYaxis').val('');
@@ -356,6 +532,10 @@
             $('#x').text('Data Name:');
             $('.yaxis').hide();
         }
+    });
+
+    $('#newTraceBtn').on('click', function () {
+        $('#newTraceForm').slideToggle(500, 'swing');
     });
 </script>
 {% endblock %}
