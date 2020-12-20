@@ -9,7 +9,7 @@ class Project(db.Model):
     description = db.Column(db.String(150))
     api_key = db.Column(db.String(200))
     created_time = db.Column(db.DateTime, default=datetime.datetime.now)
-    creator = db.Column(db.Integer)
+    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, prj_id=None, name=None, description=None, api_key=None, created_time=None, creator=None):
         self.prj_id = prj_id

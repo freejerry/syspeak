@@ -22,6 +22,12 @@ def create_app():
     from . import userpanel
     app.register_blueprint(userpanel.bp, url_prefix='/userpanel')
 
+    from . import api
+    app.register_blueprint(api.bp, url_prefix='/api')
+
+    from . import viewer
+    app.register_blueprint(viewer.bp, url_prefix='/viewer')
+
     from . import hello
     app.register_blueprint(hello.bp, url_prefix='/hello')
     return app

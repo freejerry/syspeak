@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from .userModel import User
 from .projectModel import Project
-from .chartModel import *
+from .chartModel import Chart, Series, Trace, Data
 from . import db
 
 bp = Blueprint('userpanel', __name__)
@@ -91,6 +91,15 @@ def project(prj_id):
             )
             db.session.add(series)
             db.session.commit()
+        elif request.form.get('action') == 'create_trace':
+            trace = Trace(
+                title = request.form.get('traceName'),
+                chart = request.form.get('chart'),
+                x_axis = request.form.get('xAxis'),
+                y_axis = request.form.get('yAxis')
+            )
+            db.session.add(trace)
+            db.session.commit()
         return redirect(url_for('userpanel.project', prj_id=prj_id))
     else:
         charts = Chart.query.filter_by(project=prj_id)
@@ -105,9 +114,33 @@ def delete(prj_id):
     db.session.commit()
     return redirect(url_for('userpanel.userpanel'))
 
-@bp.route('/chart/<chart_id>', methods=['GET', 'POST'])
+@bp.route('/project/<prj_id>/chart/<chart_id>', methods=['GET', 'POST'])
 @login_required
-def chart(chart_id):
+def chart(prj_id, chart_id):
     chart = Chart.query.filter_by(chart_id=chart_id).first()
-    #traces = Trace.query.filter_by(chart=chart_id) # 過濾條件chart得id,在trace得資料庫chartid記在chart得變數裡
-    return jsonify(chart.serialize())
+    if request.method == 'POST':
+        chart.title = request.form.get('chart_title')
+        chart.description = request.form.get('chart_description')
+        chart.x_label = request.form.get('chart_x_label')
+        chart.y_label = request.form.get('chart_y_label')
+        db.session.commit()
+    traces = Trace.query.filter_by(chart=chart_id) # 過濾條件chart得id,在trace得資料庫chartid記在chart得變數裡
+    series = Series.query.filter_by(project=prj_id)
+    return render_template('chart.html', chart=chart, traces=traces, series=series, project=prj_id)
+
+@bp.route('/project/<prj_id>/series/<series_id>/empty')
+@login_required
+def series_empty(prj_id, series_id):
+    data = Data.query.filter_by(project=prj_id, series=series_id).all()
+    for d in data:
+        db.session.delete(d)
+    db.session.commit()
+    return "1"
+
+@bp.route('/project/<prj_id>/trace/<trace_id>/delete')
+@login_required
+def trace_delete(prj_id, trace_id):
+    trace = Trace.query.filter_by(trace_id=trace_id).first()
+    db.session.delete(trace)
+    db.session.commit()
+    return "1"

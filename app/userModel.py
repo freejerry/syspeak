@@ -9,6 +9,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(128))
     name = db.Column(db.String(10))
 
+    projects = db.relationship("Project", backref=db.backref("user"))
+
     def __init__(self, user_id=None, account=None, password=None, name="anonymous"):
         self.user_id = user_id
         self.account = account

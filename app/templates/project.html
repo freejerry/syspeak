@@ -45,15 +45,6 @@
                         <p>{{project.api_key}}</p>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-12 col-md-3 col-lg-2">
-                        <h5>Data interface: </h5>
-                    </div>
-                    <div class="col-sm-12 col-md-9 col-lg-10">
-                        <p>https://phyiotlab.ndhu.edu.tw/speakapi/insertdata/{{project.prj_id}}/?api_key={{project.api_key}}&[Data
-                            Series]</p>
-                    </div>
-                </div>
                 <div class="row justify-content-end">
                     <div class="col-sm-12 col-md-6 col-lg-5 text-right">
                         <!-- toggle 等於觸發 , modal是bootstrap裡面的元素 modal表單,這裡的modal表單是editinformation的表單 -->
@@ -86,7 +77,7 @@
                             </div>
                             <label class="col-md-12 col-lg-2 col-form-label form-control-label text-muted">Type</label>
                             <div class="col-md-12 col-lg-4">
-                                <select name="chart_type" class="form-control">
+                                <select id="chart_type" name="chart_type" class="form-control">
                                     <option value="0" selected="">Line graph</option>
                                     <option value="9">Heatmap</option>
                                 </select>
@@ -111,7 +102,7 @@
                                 Label</label>
                             <div class="col-md-12 col-lg-3 yaxis">
                                 <input type="text" class="form-control" placeholder="要叫什麼呢" name="chart_y_label"
-                                    aria-label="chart_y_label">
+                                    id="chart_y_label" aria-label="chart_y_label">
                             </div>
                         </div>
                         <input type="hidden" name="action" value="create_chart" />
@@ -286,153 +277,6 @@
             </div>
             <div class="modal-body">
                 <div id="chartInfo">Loading...</div>
-                <div id="chartContent">
-                    <div class="row">
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <h5>Title: </h5>
-                        </div>
-                        <div class="col-sm-12 col-md-9">
-                            <p id="chart_title"></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 col-md-3 col-lg-3">
-                            <h5>Description: </h5>
-                        </div>
-                        <div class="col-sm-12 col-md-9">
-                            <p id="chart_desc"></p>
-                        </div>
-                    </div>
-                    <div id="chart_type_0">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-3 col-lg-3">
-                                <h5>X-axis label: </h5>
-                            </div>
-                            <div class="col-sm-12 col-md-9">
-                                <p id="chart_x"></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 col-md-3 col-lg-3">
-                                <h5>Y-axis label: </h5>
-                            </div>
-                            <div class="col-sm-12 col-md-9">
-                                <p id="chart_y"></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 col-lg-3">
-                                <button id="newTraceBtn" class="col-12 btn btn-primary mr-2">New Trace</button>
-                            </div>
-                        </div>
-                        <div id="newTraceForm" style="display: none;" class="row">
-                            <div class="col-md-12">
-                                <form id="traceForm" action="chart/9/new_trace/">
-                                    <p>
-                                        <label for="id_traceName">TraceName:</label>
-                                        <input type="text" name="traceName" class="form-control" maxlength="200"
-                                            required="" id="id_traceName">
-                                    </p>
-                                    <p>
-                                        <label for="id_xAxis">XAxis:</label>
-                                        <select name="xAxis" class="form-control" required="" id="id_xAxis">
-                                            <option value="" selected="">---------</option>
-                                        </select>
-                                    </p>
-                                    <p>
-                                        <label for="id_yAxis">YAxis:</label>
-                                        <select name="yAxis" class="form-control" required="" id="id_yAxis">
-                                            <option value="" selected="">---------</option>
-                                        </select>
-                                    </p>
-                                    <button type="submit" id="submitTraceForm"
-                                        class="col-12 btn btn-primary mr-2">Create</button>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5>Traces:</h5>
-                            </div>
-                        </div>
-                        <div class="table-responsive card py-3 px-3">
-                            <table class="table table-hover table-sm">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>X axis</th>
-                                    <th>Y axis</th>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td> ()</td>
-                                    <td> ()</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center" colspan="3">No any trace in this chart.</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="chart_type_9">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-3 col-lg-3">
-                                <h5>Data series: </h5>
-                            </div>
-                            <div class="col-sm-12 col-md-9">
-                                <p></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 col-lg-3">
-                                <button id="newTraceBtn" class="col-12 btn btn-primary mr-2">Mapping Data</button>
-                            </div>
-                        </div>
-                        <div id="newTraceForm" style="display: none;" class="row">
-                            <div class="col-md-12">
-                                <form id="traceForm" action="chart//new_trace/">
-                                    <p><label for="id_traceName">Name</label></p>
-                                    <p><label for="id_xAxis">Data series</label></p>
-                                    <input type="hidden" class="yAxis" id="id_yAxis" name="yAxis" value="" />
-                                    <button type="submit" id="submitTraceForm"
-                                        class="col-12 btn btn-primary mr-2">Create</button>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5>Data:</h5>
-                            </div>
-                        </div>
-                        <div class="table-responsive card py-3 px-3">
-                            <table class="table table-hover table-sm">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Data series</th>
-                                </tr>
-                                <tr>
-                                    <td class="text-center" colspan="2">Mapping data series first.</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5>Data:</h5>
-                            </div>
-                        </div>
-                        <div class="table-responsive card py-3 px-3">
-                            <table class="table table-hover table-sm">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Data series</th>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td> ()</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -469,7 +313,7 @@
     $('#emptySeriesBtn').on('click', function () {
         var series_id = $('#emptySeriesID').val();
         $.ajax({
-            url: '/speakapi/delete_data/{{project.id}}/' + series_id + '/',
+            url: '{{ project.prj_id }}/series/' + series_id + '/empty',
             beforeSend: function () {
                 $('#emptySeriesCancel').hide();
                 $('#emptySeriesBtn').attr('disabled', '');
@@ -486,6 +330,11 @@
                     $('#emptySeriesCancel').show();
                     $('#emptyMsg').html('Something was wrong.');
                 }
+            },
+            error: function (result) {
+                $('#emptySeriesBtn').removeAttr('disabled');
+                $('#emptySeriesCancel').show();
+                $('#emptyMsg').html('Something was wrong.');
             }
         });
     });
@@ -499,43 +348,26 @@
 
     loadChart = function (chart_id) {
         $.ajax({
-            url: '../chart/' + chart_id,
+            url: '{{ project.prj_id }}/chart/' + chart_id,
             beforeSend: function () {//要資料前做的事
-                $('#chart_type_0').hide();
-                $('#chart_type_9').hide();
-                $('#chartContent').hide();
-                $('#chartInfo').show();
+                $('#chartInfo').text('Loading...');
             },
-            success: function (result) {//成功要到資料後要做的事情
-                $('#chartInfo').hide();
-                $('#chartContent').show();
-                $('#chart_title').text(result.title);
-                $('#chart_desc').text(result.description);
-                $('#chart_x').text(result.x_label);
-                $('#chart_y').text(result.y_label);
-                if(result.chart_type == 0){
-                    $('#chart_type_0').show();
-                }else{
-                    $('#chart_type_9').show();
-                }
+            success: function (result) {
+                $('#chartInfo').html(result);
             }
         });
     };
 
-    $('#id_chartType').on('change', function () {
+    $('#chart_type').on('change', function () { //折線圖xy label留著，熱影像圖xy label change to dataname //
         if (this.value == '0') {
-            $('#id_chartYaxis').val('');
+            $('#chart_y_label').val('');
             $('#x').text('X-axis Label');
             $('.yaxis').show();
         } else if (this.value == '9') {
-            $('#id_chartYaxis').val('thermal');
+            $('#chart_y_label').val('thermal');
             $('#x').text('Data Name:');
             $('.yaxis').hide();
         }
-    });
-
-    $('#newTraceBtn').on('click', function () {
-        $('#newTraceForm').slideToggle(500, 'swing');
     });
 </script>
 {% endblock %}

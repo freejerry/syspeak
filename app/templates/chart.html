@@ -1,81 +1,49 @@
 <p id="chartMsg"></p>
-<div style="display: none;">
-    <p>
-        <label for="{{ form.chartTitle.id_for_label }}">{{form.chartTitle.label_tag}}</label>
-        {{form.chartTitle}}
-    </p>
-    <p>
-        <label for="{{ form.chartDisc.id_for_label }}">{{form.chartDisc.label_tag}}</label>
-        {{form.chartDisc}}
-    </p>
-    <p>
-        <label for="{{ form.chartType.id_for_label }}">{{form.chartType.label_tag}}</label>
-        {{chart.get_chartType_display}}
-    </p>
-    {% if chart.chartType == '9' %}
-    <p>
-        <label for="{{ form.chartXaxis.id_for_label }}">Data name:</label>
-        {{form.chartXaxis}}
-    </p>
-    <input type="hidden" name="chartYaxis" id="chartYaxis" value="{{chart.chartYaxis}}">
-    {% else %}
-    <p>
-        <label for="{{ form.chartXaxis.id_for_label }}">{{form.chartXaxis.label_tag}}</label>
-        {{form.chartXaxis}}
-    </p>
-    <p>
-        <label for="{{ form.chartYaxis.id_for_label }}">{{form.chartYaxis.label_tag}}</label>
-        {{form.chartYaxis}}
-    </p>
-    {% endif %}
-    <input type="hidden" name="chartType" id="id_chartType" value="{{chart.chartType}}">
-</div>
-<div class="row">
-    <div class="col-sm-12 col-md-3 col-lg-3">
-        <h5>Project name: </h5>
+{% if chart.chart_type == 0 %}
+<form id="chart_edit" action="{{project}}/chart/{{chart.chart_id}}">
+    <div class="row">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <h5>Project name: </h5>
+        </div>
+        <div class="col-sm-12 col-md-9">
+            <p>{{chart.title}}</p>
+            <input type="text" name="chart_title" class="form-control" value="{{chart.title}}" required="" style="display: none;">
+        </div>
     </div>
-    <div class="col-sm-12 col-md-9">
-        <p>{{chart.chartTitle}}</p>
+    <div class="row">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <h5>Description: </h5>
+        </div>
+        <div class="col-sm-12 col-md-9">
+            <p>{{chart.description}}</p>
+            <input type="text" name="chart_description" class="form-control" value="{{chart.description}}" required="" style="display: none;">
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-12 col-md-3 col-lg-3">
-        <h5>Discription: </h5>
+    <div class="row">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <h5>X-axis label: </h5>
+        </div>
+        <div class="col-sm-12 col-md-9">
+            <p>{{chart.x_label}}</p>
+            <input type="text" name="chart_x_label" class="form-control" value="{{chart.x_label}}" required="" style="display: none;">
+        </div>
     </div>
-    <div class="col-sm-12 col-md-9">
-        <p>{{chart.chartDisc}}</p>
+    <div class="row">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <h5>Y-axis label: </h5>
+        </div>
+        <div class="col-sm-12 col-md-9">
+            <p>{{chart.y_label}}</p>
+            <input type="text" name="chart_y_label" class="form-control" value="{{chart.y_label}}" required="" style="display: none;">
+        </div>
     </div>
-</div>
-{% if chart.chartType == '0' %}
-<div class="row">
-    <div class="col-sm-12 col-md-3 col-lg-3">
-        <h5>X-axis label: </h5>
+    <div class="row">
+        <div class="col-md-12 col-lg-3">
+            <input type="submit" class="col-12 btn btn-primary mr-2" value="Save" style="display: none;">
+            <button type="button" id="editChartBtn" class="col-12 btn btn-primary mr-2">Edit Chart</button>
+        </div>
     </div>
-    <div class="col-sm-12 col-md-9">
-        <p>{{chart.chartXaxis}}</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-12 col-md-3 col-lg-3">
-        <h5>Y-axis label: </h5>
-    </div>
-    <div class="col-sm-12 col-md-9">
-        <p>{{chart.chartYaxis}}</p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12 col-lg-3">
-        <button id="newTraceBtn" class="col-12 btn btn-primary mr-2">New Trace</button>
-    </div>
-</div>
-<div id="newTraceForm" style="display: none;" class="row">
-    <div class="col-md-12">
-        <form id="traceForm" action="chart/{{chart.id}}/new_trace/">
-            {{ traceForm.as_p }}
-            <button type="submit" id="submitTraceForm" class="col-12 btn btn-primary mr-2">Create</button>
-        </form>
-    </div>
-</div>
+</form>
 <div class="row">
     <div class="col-md-12">
         <h5>Traces:</h5>
@@ -87,32 +55,106 @@
             <th>Name</th>
             <th>X axis</th>
             <th>Y axis</th>
+            <th></th>
         </tr>
-        {% if traces %}
+        {% if traces.count() %}
         {% for trace in traces %}
         <tr>
-            <td>{{trace.traceName}}</td>
-            <td>{{trace.xAxis}} ({{trace.xAxis_id}})</td>
-            <td>{{trace.yAxis}} ({{trace.yAxis_id}})</td>
-            <tr />
-            {% endfor %}
-            {% else %}
+            <td>{{trace.title}}</td>
+            <td>{{trace.x_series.label}} ({{trace.x_axis}})</td>
+            <td>{{trace.y_series.label}} ({{trace.y_axis}})</td>
+            <td><button type="button" class="delTraceBtn btn btn-danger" data-id="{{trace.trace_id}}">Delete</button></td>
+        </tr>
+        {% endfor %}
+        {% else %}
         <tr>
             <td class="text-center" colspan="3">No any trace in this chart.</td>
         </tr>
         {% endif %}
     </table>
 </div>
-{% elif chart.chartType == '9' %}
 <div class="row">
-    <div class="col-sm-12 col-md-3 col-lg-3">
-        <h5>Data series: </h5>
-    </div>
-    <div class="col-sm-12 col-md-9">
-        <p>{{chart.chartXaxis}}</p>
+    <div class="mt-md-2 col-md-12 col-lg-3">
+        <button id="newTraceBtn" class="col-12 btn btn-primary mr-2">New Trace</button>
     </div>
 </div>
-{% if traces.count == 0 %}
+<div id="newTraceForm" style="display: none;" class="row">
+    <div class="col-md-12">
+        <form id="traceForm" action="/userpanel/project/{{project}}">
+            <p>
+                <label for="id_traceName">TraceName:</label>
+                <input type="text" name="traceName" class="form-control" maxlength="200" required="" id="id_traceName">
+            </p>
+            <p>
+                <label for="id_xAxis">XAxis:</label>
+                <select name="xAxis" class="form-control" required="" id="id_xAxis">
+                    <option value="" selected="">---------</option>
+                    {% for ser in series %}
+                    <option value="{{ ser.series_id }}">{{ ser.label }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <label for="id_yAxis">YAxis:</label>
+                <select name="yAxis" class="form-control" required="" id="id_yAxis">
+                    <option value="" selected="">---------</option>
+                    {% for ser in series %}
+                    <option value="{{ ser.series_id }}">{{ ser.label }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <input type="hidden" name="chart" value="{{ chart.chart_id }}" />
+            <input type="hidden" name="action" value="create_trace">
+            <button type="submit" id="submitTraceForm" class="col-12 btn btn-primary mr-2">Create</button>
+        </form>
+    </div>
+</div>
+{% elif chart.chart_type == 9 %}
+<form id="chart_edit" action="{{project}}/chart/{{chart.chart_id}}">
+    <div class="row">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <h5>Project name: </h5>
+        </div>
+        <div class="col-sm-12 col-md-9">
+            <p>{{chart.title}}</p>
+            <input type="text" name="chart_title" class="form-control" value="{{chart.title}}" required="" style="display: none;">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <h5>Description: </h5>
+        </div>
+        <div class="col-sm-12 col-md-9">
+            <p>{{chart.description}}</p>
+            <input type="text" name="chart_description" class="form-control" value="{{chart.description}}" required="" style="display: none;">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            <h5>Data name: </h5>
+        </div>
+        <div class="col-sm-12 col-md-9">
+            <p>{{chart.x_label}}</p>
+            <input type="text" name="chart_x_label" class="form-control" value="{{chart.x_label}}" required="" style="display: none;">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-lg-3">
+            <input type="hidden" name="chart_y_label" value="{{chart.y_label}}">
+            <input type="submit" class="col-12 btn btn-primary mr-2" value="Save" style="display: none;">
+            <button type="button" id="editChartBtn" class="col-12 btn btn-primary mr-2">Edit Chart</button>
+        </div>
+    </div>
+</form>
+{% if traces.count() == 0 %}
+<div class="row">
+    <div class="col-md-12">
+        <h5>Data:</h5>
+    </div>
+    <div class="col-md-12">
+        <p>Mapping data series first.</p>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12 col-lg-3">
         <button id="newTraceBtn" class="col-12 btn btn-primary mr-2">Mapping Data</button>
@@ -120,29 +162,23 @@
 </div>
 <div id="newTraceForm" style="display: none;" class="row">
     <div class="col-md-12">
-        <form id="traceForm" action="chart/{{chart.id}}/new_trace/">
-            <p><label for="id_traceName">Name</label>{{ traceForm.traceName }}</p>
-            <p><label for="id_xAxis">Data series</label>{{ traceForm.xAxis }}</p>
-            <input type="hidden" class="yAxis" id="id_yAxis" name="yAxis" value="" />
+        <form id="traceForm" action="/userpanel/project/{{project}}">
+            <p>
+                <label for="id_xAxis">Data series</label>
+                <select name="xAxis" class="form-control" required="" id="id_xAxis">
+                    <option value="" selected="">---------</option>
+                    {% for ser in series %}
+                    <option value="{{ ser.series_id }}">{{ ser.label }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <input type="hidden" name="traceName" value="heatmap">
+            <input type="hidden" class="yAxis" name="yAxis" value="0" />
+            <input type="hidden" name="chart" value="{{ chart.chart_id }}" />
+            <input type="hidden" name="action" value="create_trace" />
             <button type="submit" id="submitTraceForm" class="col-12 btn btn-primary mr-2">Create</button>
         </form>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <h5>Data:</h5>
-    </div>
-</div>
-<div class="table-responsive card py-3 px-3">
-    <table class="table table-hover table-sm">
-        <tr>
-            <th>Name</th>
-            <th>Data series</th>
-        </tr>
-        <tr>
-            <td class="text-center" colspan="2">Mapping data series first.</td>
-            <tr />
-    </table>
 </div>
 {% else %}
 <div class="row">
@@ -153,15 +189,15 @@
 <div class="table-responsive card py-3 px-3">
     <table class="table table-hover table-sm">
         <tr>
-            <th>Name</th>
             <th>Data series</th>
+            <th></th>
         </tr>
         {% for trace in traces %}
         <tr>
-            <td>{{trace.traceName}}</td>
-            <td>{{trace.xAxis}} ({{trace.xAxis_id}})</td>
-            <tr />
-            {% endfor %}
+            <td>{{trace.x_series.label}} ({{trace.x_axis}})</td>
+            <td><button type="button" class="delTraceBtn btn btn-danger" data-id="{{trace.trace_id}}">Delete</button></td>
+        </tr>
+        {% endfor %}
     </table>
 </div>
 {% endif %}
@@ -174,21 +210,33 @@
     $('#id_xAxis').on('change', function () {
         $('.yAxis').val($(this).val());
     });
-    $('#traceForm').submit(function (e) {
+    $('#traceForm, #chart_edit').on("submit", function (e) {
+        e.preventDefault();
         var form = $(this);
         var url = form.attr('action');
         $.ajax({
             type: "POST",
             url: url,
             data: form.serialize(),
-            beforeSend: function (xhr, settings) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            },
             success: function (data) {
-                console.log(data);
-                loadChart({{ chart.id }});
-    }
+                //console.log(data);
+                loadChart("{{ chart.chart_id }}");
+            }
+        });
     });
-    e.preventDefault();
-  });
+    $('#editChartBtn').on('click', function(){
+        $(this).hide();
+        $('#chart_edit p').hide();
+        $('#chart_edit input').show();
+    });
+    $('.delTraceBtn').on('click', function(){
+        var trace = $(this).data('id');
+        $.ajax({
+            type: "GET",
+            url: "{{project}}/trace/" + trace + "/delete",
+            success: function (data) {
+                loadChart("{{ chart.chart_id }}");
+            }
+        });
+    });
 </script>

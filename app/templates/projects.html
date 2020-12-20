@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %} View project {% endblock %}
+{% block vp %} actives{% endblock %}
+
+{% block content %}
+<section class="container pb-5">
+    <div class="row">
+        <div class="col-md-12 py-5">
+            <h1 class="text-truncate">Project list</h1>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <tbody>
+                        <tr>
+                            <th class="w-50">Project</th>
+                            <th class="w-25">Created date</th>
+                            <th class="w-25">Creator</th>
+                        </tr>
+                        {% if projects %}
+                        {% for project in projects %}
+                        <tr>
+                            <td><a href="view/{{ project.prj_id }}/">{{ project.name }}</a></td>
+                            <td>{{ project.created_time }}</td>
+                            <td>{{ project.user.name }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td class="text-center" colspan="4">There is no any project available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="w-100 my-4"></div>
+    </div>
+</section>
+{% endblock %}
