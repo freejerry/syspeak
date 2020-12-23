@@ -68,3 +68,7 @@ footer {
     font-size: 0.7rem;
   }
 }
+
+.chart_del_btn {
+  color: #FFF !important;
+}

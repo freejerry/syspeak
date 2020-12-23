@@ -5,7 +5,7 @@ from flask_login import LoginManager #引入登入模組函式庫
 
 app = Flask(__name__) #用Flask跑app
 app.config.from_object('config.Config') # 載入設定檔
-db = SQLAlchemy() #實體化資料庫連線模組
+db = SQLAlchemy(app) #實體化資料庫連線模組
 
 login_manager = LoginManager() #實體化登入模組
 login_manager.login_view = "userpanel.login"

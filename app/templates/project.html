@@ -118,13 +118,15 @@
                         <th>Title</th>
                         <th>Type</th>
                         <th>Discription</th>
+                        <th></th>
                     </tr>
                     {% if charts.count() %}
                     {% for chart in charts %}
                     <tr>
-                        <td><a href="#" class="viewChart" data-id="{{chart.chart_id}}">{{chart.title}}</a></td>
+                        <td><a href="#" id="chart_title_{{ chart.chart_id }}" class="viewChart" data-id="{{chart.chart_id}}">{{chart.title}}</a></td>
                         <td>{{chart.type_text()}}</td>
-                        <td>{{chart.description}}</td>
+                        <td id="chart_desc_{{ chart.chart_id }}">{{chart.description}}</td>
+                        <td><a class="chart_del_btn btn btn-sm btn-danger rounded-right" href="{{ project.prj_id }}/chart/{{chart.chart_id}}/delete"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></td>
                     </tr>
                     {% endfor %}
                     {% else %}
@@ -153,7 +155,7 @@
                         </form>
                     </div>
                 </div>
-                <table class="table table-hover table-sm">
+                <table id="series_table" class="table table-hover table-sm">
                     <tr>
                         <th class="w-25">ID</th>
                         <th class="w-50">Name</th>
@@ -161,14 +163,14 @@
                     </tr>
                     {% if series.count() %}
                     {% for ser in series %}
-                    <tr>
+                    <tr id="series_tr_{{ser.series_id}}">
                         <td>
                             <!--<a href="series/{{ ser.id }}/">-->{{ser.series_id}}
                             <!--</a>-->
                         </td>
                         <td>{{ser.label}}</td>
-                        <td><button class="empty_series btn btn-sm btn-danger" data-id="{{ser.series_id}}"
-                                data-name="{{ser.label}}">Empty</button></td>
+                        <td><button class="edit_series btn btn-sm btn-info" data-id="{{ser.series_id}}"
+                                data-name="{{ser.label}}"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button></td>
                     </tr>
                     {% endfor %}
                     {% else %}
@@ -240,6 +242,36 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="editSerModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit series</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="serEditForm" action="./{{ project.prj_id }}" method="POST">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label form-control-label text-muted">Series name</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" name="ser_name" id="ser_name"
+                                aria-label="ser_name">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="action" value="update" />
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-pencil" aria-hidden="true"></i> Update</button>
+                    <button type="button" id="empty_series" class="btn btn-danger"><i class="fa fa-eraser" aria-hidden="true"></i> Empty</button>
+                    <button type="button" id="del_series" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i> Delete</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="emptySerModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -259,10 +291,33 @@
                     <button id="emptySeriesCancel" type="button" class="btn btn-secondary"
                         data-dismiss="modal">Cancel</button>
                     <button id="emptySeriesBtn" type="button" class="btn btn-danger">Empty</button>
-                    <button id="emptySeriesOK" type="button" class="btn btn-primary"" style=" display: none;"
+                    <button id="emptySeriesOK" type="button" class="btn btn-primary" style=" display: none;"
                         data-dismiss="modal">Close</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteSerModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete series</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+                <div class="modal-body text-center">
+                    <p id="deleteMsg">Are you sure to delete this series: "<b id="deleteSerModalName"></b>"?<br />
+                        All data in this series will be delete.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="delSeriesCancel" type="button" class="btn btn-secondary"
+                        data-dismiss="modal">Cancel</button>
+                    <button id="delSeriesBtn" type="button" class="btn btn-danger">Yes, I do</button>
+                    <button id="delSeriesOK" type="button" class="btn btn-primary" style=" display: none;"
+                        data-dismiss="modal">Close</button>
+                </div>
         </div>
     </div>
 </div>
@@ -296,7 +351,14 @@
     $('#new_chart').on('click', function () {
         $('#form_chart').slideToggle(500, 'swing');
     });
-    $('.empty_series').on('click', function () {
+    $('.edit_series').on('click', function () {
+        $('#editSerModal').modal('show');
+        $('#empty_series, #del_series').data('id', $(this).data('id'));
+        $('#empty_series, #del_series').data('name', $(this).data('name'));
+        $('#ser_name').val($(this).data('name'));
+    });
+    $('#empty_series').on('click', function () {
+        $('#editSerModal').modal('hide');
         $('#emptySeriesBtn').removeAttr('disabled');
         $('#emptySeriesCancel').show();
         $('#emptySeriesBtn').show();
@@ -338,6 +400,51 @@
             }
         });
     });
+    $('#del_series').on('click', function(){
+        $('#deleteMsg').html('Are you sure to delete this series: "<b id="deleteSerModalName"></b>"?<br />All data in this series will be deleted.');
+        $('#editSerModal').modal('hide');
+        $('#deleteSerModal').modal('show');
+        $('#deleteSerModalName').text($(this).data('name'));
+        $('#delSeriesBtn').data('id', $(this).data('id'));
+        $('#delSeriesBtn').removeAttr('disabled');
+        $('#delSeriesCancel').show();
+        $('#delSeriesBtn').show();
+        $('#delSeriesOK').hide();
+    });
+    $('#delSeriesBtn').on('click', function () {
+        var series_id = $('#delSeriesBtn').data('id');
+        $.ajax({
+            url: '{{ project.prj_id }}/series/' + series_id + '/delete',
+            beforeSend: function () {
+                $('#delSeriesCancel').hide();
+                $('#delSeriesBtn').attr('disabled', '');
+                $('#deleteMsg').html('Processing...<br />Please don\'t close this dialog until it finish.');
+            },
+            success: function (result) {
+                if (result == '1') {
+                    $('#delSeriesCancel').hide();
+                    $('#delSeriesBtn').hide();
+                    $('#delSeriesOK').show();
+                    $('#deleteMsg').html('Series has been deleted.');
+                    $('#series_tr_' + series_id).remove();
+                    if($('#series_table tr').length == 1){
+                        $('<tr>').append($('<td>').addClass('text-center').attr('colspan', '3').text('No data series available, create the new one first.')).appendTo($('#series_table'));
+                    }
+                } else {
+                    $('#delSeriesCancel').hide();
+                    $('#delSeriesBtn').hide();
+                    $('#delSeriesOK').show();
+                    $('#deleteMsg').html('Fuck, don\'t forget your chart, baby!.');
+                }
+            },
+            error: function (result) {
+                $('#delSeriesBtn').removeAttr('disabled');
+                $('#delSeriesCancel').show();
+                $('#deleteMsg').html('Something was wrong.');
+            }
+        });
+    });
+
 
     $('.viewChart').on('click', function () { //”.“是class,當class=viewchart的東西被按到就觸發
         event.preventDefault(); //避免html預設值跳出的功能

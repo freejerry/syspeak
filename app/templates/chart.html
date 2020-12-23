@@ -3,11 +3,11 @@
 <form id="chart_edit" action="{{project}}/chart/{{chart.chart_id}}">
     <div class="row">
         <div class="col-sm-12 col-md-3 col-lg-3">
-            <h5>Project name: </h5>
+            <h5>Title: </h5>
         </div>
         <div class="col-sm-12 col-md-9">
             <p>{{chart.title}}</p>
-            <input type="text" name="chart_title" class="form-control" value="{{chart.title}}" required="" style="display: none;">
+            <input type="text" id="chart_title" name="chart_title" class="form-control" value="{{chart.title}}" required="" style="display: none;">
         </div>
     </div>
     <div class="row">
@@ -16,7 +16,7 @@
         </div>
         <div class="col-sm-12 col-md-9">
             <p>{{chart.description}}</p>
-            <input type="text" name="chart_description" class="form-control" value="{{chart.description}}" required="" style="display: none;">
+            <input type="text" id="chart_description" name="chart_description" class="form-control" value="{{chart.description}}" required="" style="display: none;">
         </div>
     </div>
     <div class="row">
@@ -113,11 +113,11 @@
 <form id="chart_edit" action="{{project}}/chart/{{chart.chart_id}}">
     <div class="row">
         <div class="col-sm-12 col-md-3 col-lg-3">
-            <h5>Project name: </h5>
+            <h5>Title: </h5>
         </div>
         <div class="col-sm-12 col-md-9">
             <p>{{chart.title}}</p>
-            <input type="text" name="chart_title" class="form-control" value="{{chart.title}}" required="" style="display: none;">
+            <input type="text" id="chart_title" name="chart_title" class="form-control" value="{{chart.title}}" required="" style="display: none;">
         </div>
     </div>
     <div class="row">
@@ -126,7 +126,7 @@
         </div>
         <div class="col-sm-12 col-md-9">
             <p>{{chart.description}}</p>
-            <input type="text" name="chart_description" class="form-control" value="{{chart.description}}" required="" style="display: none;">
+            <input type="text" id="chart_description" name="chart_description" class="form-control" value="{{chart.description}}" required="" style="display: none;">
         </div>
     </div>
     <div class="row">
@@ -210,7 +210,7 @@
     $('#id_xAxis').on('change', function () {
         $('.yAxis').val($(this).val());
     });
-    $('#traceForm, #chart_edit').on("submit", function (e) {
+    $('#traceForm').on("submit", function (e) {
         e.preventDefault();
         var form = $(this);
         var url = form.attr('action');
@@ -224,11 +224,28 @@
             }
         });
     });
+    $('#chart_edit').on("submit", function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: form.serialize(),
+            success: function (data) {
+                //console.log(data);
+                loadChart("{{ chart.chart_id }}");
+                $('#chart_title_{{ chart.chart_id }}').text(form.find('#chart_title').val());
+                $('#chart_desc_{{ chart.chart_id }}').text(form.find('#chart_description').val());
+            }
+        });
+    });
     $('#editChartBtn').on('click', function(){
         $(this).hide();
         $('#chart_edit p').hide();
         $('#chart_edit input').show();
     });
+
     $('.delTraceBtn').on('click', function(){
         var trace = $(this).data('id');
         $.ajax({
