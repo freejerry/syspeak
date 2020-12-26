@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block title %}Project monitor - {{project.project_name}}{% endblock %}
+{% block vp %} actives{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+{% endblock %}
+
+{% block content %}
+<section class="container pb-5">
+    <div class="row">
+        <div class="col-md-12 py-3">
+            <h1>Project - {{project.name}}</h1>
+            <h4 class="text-truncate">{{project.description}}</h4>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-2">
+            <div class="pb-3">
+                <a href="../projects" class="btn btn-primary align-bottom mr-1 col-sm-12 text-light">Back to list</a>
+            </div>
+        </div>
+        <div class="col-md-12 py-3">
+            <div id="charts" class="row text-center"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block bodyjs %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"
+    integrity="sha512-UXumZrZNiOwnTcZSHLOfcTs0aos2MzBWHXOHOuB0J/R44QB0dwY5JgfbvljXcklVf65Gc4El6RjZ+lnwd2az2g=="
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
+<script>
+    var series = {};
+    $(document).ready(function () { //document 為當前所在的文件
+        fetch('/api/getseries/{{project.prj_id}}/top1000', {})
+            .then((response) => {
+                // 這裡會得到一個 ReadableStream 的物件
+                //console.log(response);
+                // 可以透過 blob(), json(), text() 轉成可用的資訊
+                return response.json();
+            }).then((jsonData) => {
+                //console.log(jsonData);
+                for (var j in jsonData) {
+                    series[j] = jsonData[j];
+                }
+                //console.log(series);
+                return fetch('/api/getchart/{{project.prj_id}}/all', {}); //fetch與ajax相同的使用目的 ，必須先做完上面才做下面
+            }).then((response) => {
+                // 這裡會得到一個 ReadableStream 的物件
+                //console.log(response);
+                // 可以透過 blob(), json(), text() 轉成可用的資訊
+                return response.json();
+            }).then((jsonData) => {
+                //console.log(jsonData);//jsondata為所有的chart
+                for (var i = 0; i < jsonData.length; i++) { //寫一個for迴圈，將所有的chart一一列出
+                    var chart = jsonData[i]; //江chart的資料存成一個陣列，chart又是一個structure定義
+                    $('<div style="height: 320px;" class="col-md-6">') //框框得長寬
+                        .append('<canvas class="chart4" id="chart_' + chart.id + '"></canvas>') //將每一個chart的框框編號
+                        .appendTo('#charts');//生成chart外面的框框，還沒有將資料塞入
+                    var chart_type;
+                    if (chart.chart_type == 0) {
+                        var chart_label = {
+                            xAxes: chart.x_label,
+                            yAxes: chart.y_label
+                        }
+                        var dataset = [];
+                        for (var j = 0; j < chart.traces.length; j++) {
+                            if (chart.traces[j].x_axis == chart.traces[j].y_axis) {
+                                chart_type = 'line';
+                                var data = {
+                                    label: chart.traces[j].title,
+                                    data: [],
+                                    showLine: true,
+                                    fill: false
+                                };
+                                xLabels = [];
+                                for (var k = 0; k < series[chart.traces[j].x_axis].length; k++) {
+                                    data.data.push( //var data底下的data，push使將下面的東西塞進data[]，形成一個list
+                                        series[chart.traces[j].x_axis][k].data
+                                    )
+                                    xLabels.push(series[chart.traces[j].x_axis][k].inserted_time);
+                                }
+                                dataset.push(data);
+                            } else {
+                                chart_type = 'scatter';
+                                var data = {
+                                    label: chart.traces[j].title,
+                                    data: [],
+                                    showLine: true,
+                                    fill: false
+                                };
+                                for (var k = 0; k < series[chart.traces[j].x_axis].length; k++) {
+                                    data.data.push(
+                                        {
+                                            x: series[chart.traces[j].x_axis][k].data,
+                                            y: series[chart.traces[j].y_axis][k].data
+                                        }
+                                    )
+                                }
+                                dataset.push(data);
+                            }
+                        }
+                        console.log(dataset);
+                        generateChart("chart_" + chart.id, chart_type, chart.title, chart_label, dataset, xLabels)
+                    }
+                }
+            }).catch((err) => {
+                console.log('錯誤:', err);
+            });;
+
+    });
+    
+    function generateChart(chart_id, chart_type, chart_title, chart_label, chart_dataset, xLabels = null) {
+        console.log(chart_dataset);
+        var ctx = document.getElementById(chart_id).getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: chart_type,
+            // The data for our dataset
+            data: {
+                xLabels: xLabels,
+                datasets: chart_dataset
+            },
+
+            // Configuration options go here
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    text: chart_title
+                },
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: chart_label.xAxes
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: chart_label.yAxes
+                        }
+                    }]
+                },
+                plugins: {
+                    zoom: {
+                        // Container for pan options
+                        pan: {
+                            // Boolean to enable panning
+                            enabled: false,
+
+                            // Panning directions. Remove the appropriate direction to disable
+                            // Eg. 'y' would only allow panning in the y direction
+                            // A function that is called as the user is panning and returns the
+                            // available directions can also be used:
+                            //   mode: function({ chart }) {
+                            //     return 'xy';
+                            //   },
+                            mode: 'xy',
+
+                            rangeMin: {
+                                // Format of min pan range depends on scale type
+                                x: null,
+                                y: null
+                            },
+                            rangeMax: {
+                                // Format of max pan range depends on scale type
+                                x: null,
+                                y: null
+                            },
+
+                            // On category scale, factor of pan velocity
+                            speed: 20,
+
+                            // Minimal pan distance required before actually applying pan
+                            threshold: 10,
+
+                            // Function called while the user is panning
+                            onPan: function ({ chart }) { console.log(`I'm panning!!!`); },
+                            // Function called once panning is completed
+                            onPanComplete: function ({ chart }) { console.log(`I was panned!!!`); }
+                        },
+
+                        // Container for zoom options
+                        zoom: {
+                            // Boolean to enable zooming
+                            enabled: true,
+
+                            // Enable drag-to-zoom behavior
+                            drag: true,
+
+                            // Drag-to-zoom effect can be customized
+                            drag: {
+                                borderColor: 'rgba(225,225,225,0.3)',
+                                borderWidth: 5,
+                                backgroundColor: 'rgb(225,225,225)',
+                                animationDuration: 0
+                            },
+
+                            // Zooming directions. Remove the appropriate direction to disable
+                            // Eg. 'y' would only allow zooming in the y direction
+                            // A function that is called as the user is zooming and returns the
+                            // available directions can also be used:
+                            //   mode: function({ chart }) {
+                            //     return 'xy';
+                            //   },
+                            mode: 'xy',
+
+                            rangeMin: {
+                                // Format of min zoom range depends on scale type
+                                x: null,
+                                y: null
+                            },
+                            rangeMax: {
+                                // Format of max zoom range depends on scale type
+                                x: null,
+                                y: null
+                            },
+
+                            // Speed of zoom via mouse wheel
+                            // (percentage of zoom on a wheel event)
+                            speed: 0.1,
+
+                            // Minimal zoom distance required before actually applying zoom
+                            threshold: 2,
+
+                            // On category scale, minimal zoom level before actually applying zoom
+                            sensitivity: 3,
+
+                            // Function called while the user is zooming
+                            onZoom: function ({ chart }) { console.log(`I'm zooming!!!`); },
+                            // Function called once zooming is completed
+                            onZoomComplete: function ({ chart }) { console.log(`I was zoomed!!!`); }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

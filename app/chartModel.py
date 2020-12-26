@@ -113,9 +113,10 @@ class Data(db.Model):
     def __str__(self):
         return '<Data %s>' % self.title
     
+    @property
     def serialize(self):
         return {"data_id": self.data_id,
                 "data": self.data,
-                "inserted_time": self.inserted_time,
+                "inserted_time": self.inserted_time.strftime("%m/%d/%Y, %H:%M:%S"),
                 "series": self.series,
                 "project": self.project}

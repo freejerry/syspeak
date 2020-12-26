@@ -19,7 +19,7 @@
                         {% if projects %}
                         {% for project in projects %}
                         <tr>
-                            <td><a href="view/{{ project.prj_id }}/">{{ project.name }}</a></td>
+                            <td><a href="project/{{ project.prj_id }}">{{ project.name }}</a></td>
                             <td>{{ project.created_time }}</td>
                             <td>{{ project.user.name }}</td>
                         </tr>
